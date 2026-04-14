@@ -22,6 +22,7 @@ torch.cuda.manual_seed(42)
 
 CACHE_DIR = "/extra/mattia.proietti/hf_models"
 DATA_PATH = "../data"
+BASE_OUTDIR = "../results"
 DEVICE = "cuda:0"
 
 
@@ -78,7 +79,16 @@ def load_data(data_arg) -> Tuple[pd.DataFrame, str]:
     print(f"\n{data} data loaded from {data_path}\n")
     return df, data 
     
-#TODO CHANGE INPUT DATA REMOVING THE DETERMINANT!!!
+def prompt_format(sent, task) -> str:
+    """
+    Format the prompt appropriately for the model. This is a placeholder function and can be modified to fit the specific requirements of the model being used.
+    """
+    if task == "questions":
+        return f"Answer yes or no to the following question: {sent} \nAnswer:"
+    else:
+        return f"Judge if the following statement is true or false: {sent} \nAnswer:"
+    
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -94,7 +104,7 @@ if __name__ == "__main__":
     
     print(df.head(), data, args.model, args.task)
     #instantiate the output path for the results
-    out_path = f"results/{args.task}/{args.model}"
+    out_path = f"{BASE_OUTDIR}/{args.task}/{args.model}"
     os.makedirs(out_path, exist_ok=True)
 
     print(f"\nStarting feeding the model with {args.task} inputs\n")
@@ -105,16 +115,22 @@ if __name__ == "__main__":
     # load model 
     model_id = MODELS[args.model]
     print(f"Loading {model_id}...")
+    model_kwargs = {"cache_dir": CACHE_DIR}
+    if DEVICE != "cpu":
+        model_kwargs["device_map"] = DEVICE
+
     model = outlines.from_transformers(
-                AutoModelForCausalLM.from_pretrained(model_id, device_map=DEVICE, cache_dir=CACHE_DIR),
+                AutoModelForCausalLM.from_pretrained(model_id, **model_kwargs),
                 AutoTokenizer.from_pretrained(model_id, cache_dir=CACHE_DIR)
                 )
     
+    print(f"\nExample prompt: {prompt_format(sents[0], args.task)}\n")
     #feeding the model with the chosen inputs
-    answers = [model(s, output_type, max_new_tokens=10, temperature=0., do_sample=False)   for s in tqdm(sents) if s] 
+    answers = [model(prompt_format(s, args.task), output_type, max_new_tokens=10, temperature=0., do_sample=False)   for s in tqdm(sents) if s] 
     # testing swapped 
     print(f"\nStarting feeding the model with {args.task} swapped\n")
-    answer_swapped = [model(s, output_type, max_new_tokens=10, temperature=0., do_sample=False) for s in tqdm(swapped) if s]
+    print(f"Example prompt swapped: {prompt_format(swapped[0], args.task)}\n")
+    answer_swapped = [model(prompt_format(s, args.task), output_type, max_new_tokens=10, temperature=0., do_sample=False) for s in tqdm(swapped) if s]
 
     # save the results in a dataframe
     results = pd.DataFrame(zip(nodes,  answers, answer_swapped),
@@ -130,8 +146,10 @@ if __name__ == "__main__":
     print(f"\nBrief summary for {args.task}_swapped: {Counter(answer_swapped)}")
     
     # accuracy meronymy knowledge criterion: the model should answer "yes" to the original question and "no" to the swapped version (or "true"/"false" for statements)
-    accuracy = [df[df["answers"] != df["answers_swapped"]].shape[0] / df.shape[0] * 100]
-    print(f"\nAccuracy of the model on the swapped version: {accuracy}")
+    targets  = "yes/no" if args.task == "questions" else "true/false"
+    
+    accuracy = len([(i,e) for i, e in zip(answers, answer_swapped) if i == targets.split("/")[0] and e == targets.split("/")[1]]) / len(answers) * 100
+    print(f"\nAccuracy of the model on the Meronymy Knowledge Criterion: {accuracy}")
             
             
     
