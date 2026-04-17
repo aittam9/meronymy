@@ -62,8 +62,8 @@ fi
 
 echo "Running task=$TASK on ${#MODELS[@]} models and ${#DATASETS[@]} dataset(s)"
 
-for DATA_ITEM in "${DATASETS[@]}"; do
-	for MODEL in "${MODELS[@]}"; do
+for MODEL in "${MODELS[@]}"; do
+	for DATA_ITEM in "${DATASETS[@]}"; do
 		echo ""
 		echo "=== Running model: $MODEL ==="
 		echo "Data: $DATA_ITEM, Task: $TASK"

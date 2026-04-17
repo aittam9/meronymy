@@ -195,3 +195,5 @@ def make_questions_from_statements(statements: List[str])-> List[str]:
 
         questions.append(question)
     return questions
+
+

@@ -10,8 +10,8 @@ MODELS = {
     "gemma-7b-it": "google/gemma-7b-it",
 
     # mistral
-    "mistral-3-3b-it": "mistralai/Ministral-3-3B-Instruct-2512",
-    "mistral-3-8b-it": "mistralai/Ministral-3-8B-Instruct-2512",
+    # "mistral-3-3b-it": "mistralai/Ministral-3-3B-Instruct-2512",
+    # "mistral-3-8b-it": "mistralai/Ministral-3-8B-Instruct-2512",
 
 
 }
