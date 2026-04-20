@@ -47,7 +47,7 @@ def load_model(model_name: str, device:str =  DEVICE, cache_dir: str | None = No
 
 	model.to(device)
 	model.eval()
-	return model, tokenizer, device
+	return model, tokenizer
 
 
 def sentence_logprob(model, tokenizer, sentence: str, device:str | None = None) -> SentenceScore:
@@ -84,14 +84,12 @@ def score_pair(model, tokenizer, first: str, second: str, device: str | None = N
 def main() -> None:
 	parser = argparse.ArgumentParser(description="Score sentence pairs with a causal LM.")
 	parser.add_argument("--data", required=True, help="TSV file with paired sentences")
-	parser.add_argument("--task", required = True, choices = ["questions", "statements"], help="The type of input to feed the model with. Choose between 'questions' and 'statements'.")
+	parser.add_argument("--task", required = True, choices = ["questions", "statements", "fake"], help="The type of input to feed the model with. Choose between 'questions', 'statements', or 'fake'.")
 	parser.add_argument("--model", required = True, choices=MODELS.keys(), help="Hugging Face causal LM name or path")
 	parser.add_argument("--test", required=False, action = "store_true", help="Optional path to save the scored TSV")
 	args = parser.parse_args()
 
-	
-	# input_path = Path(args.data)
-	# df = pd.read_csv(input_path, sep="\t") #read_pairs(input_path, args.first_col, args.second_col)
+	# load and unpack data
 	df, data = load_data(args.data)
 	print(df.head())
 	nodes, sents, swapped,  _ = unpack_data(df, args.task)
@@ -108,8 +106,9 @@ def main() -> None:
 	#load model
 	model_id = MODELS[args.model]
 	print(f"Loading {model_id}...")
-	model, tokenizer, device = load_model(model_id, device=DEVICE, cache_dir=CACHE_DIR)
+	model, tokenizer = load_model(model_id, device=DEVICE, cache_dir=CACHE_DIR)
 
+	print(f"Example sentence: {sents[0]}\nExample swapped sentence: {swapped[0]}\n")
 	rows = []
 	for n, s, s_swap in tqdm(zip(nodes, sents, swapped), total=len(nodes)):
 		first_text = s
@@ -131,7 +130,7 @@ def main() -> None:
 	# build and save results dataframe
 	result = pd.DataFrame(rows)
 	
-	print(result)
+	# print(result)
 	print()
 	print(f"First sentence has higher logprob in {result['sents_logprob_greater'].mean() * 100:.2f}% of pairs")
 
