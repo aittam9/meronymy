@@ -1,4 +1,3 @@
-
 import re 
 import spacy 
 import pandas as pd
@@ -95,8 +94,8 @@ def statements_from_nodes(nodes: List[Tuple]) -> Tuple[List[str], List[str]]:
     for n in nodes:
         meronym = n[0]
         holonym = n[1]
-        phrase = f"The {meronym} is a part of the {holonym}"
-        phrase_swapped = f"The {holonym} is a part of the {meronym}"
+        phrase = f"The {meronym} is part of the {holonym}"
+        phrase_swapped = f"The {holonym} is part of the {meronym}"
 
         statements.append(phrase)
         swapped_statements.append(phrase_swapped)
@@ -109,8 +108,8 @@ def questions_from_nodes(nodes: List[Tuple]) -> Tuple[List[str], List[str]]:
     for n in nodes:
         meronym = n[0]
         holonym = n[1]
-        q = f"Is the {meronym} a part of the {holonym}?"
-        q_swapped = f"Is the {holonym} a part of the {meronym}?"
+        q = f"Is the {meronym} part of the {holonym}?"
+        q_swapped = f"Is the {holonym} part of the {meronym}?"
 
         questions.append(q)
         swapped_questions.append(q_swapped)

@@ -23,6 +23,7 @@ def load_data(data_arg) -> Tuple[pd.DataFrame, str]:
         data_path = f"{DATA_PATH}/conceptnet/conceptnet.tsv"
         data = "conceptnet"
         df = pd.read_csv(data_path, sep="\t")
+    
     elif "fake" in data_arg:
         data_path = f"{DATA_PATH}/fake/fake.tsv"
         data = "fake"
