@@ -1,15 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -ne 2 ]]; then
-	echo "Usage: $0 <data> <task>"
+if [[ $# -ne 3 ]]; then
+	echo "Usage: $0 <data> <task> <script_mode>"
 	echo "  data: mcrae | mcrae_lemma | conceptnet | fake | all"
 	echo "  task: questions | statements"
+	echo "  script_mode: standard | template"
 	exit 1
 fi
 
 DATA="$1"
 TASK="$2"
+SCRIPT_MODE="$3"
+
+if [[ "$SCRIPT_MODE" == "template" ]]; then
+	python_script="get_probs_chat_temp.py"
+elif [[ "$SCRIPT_MODE" == "standard" ]]; then
+	python_script="get_probs.py"
+else
+	echo "Invalid script_mode: $SCRIPT_MODE"
+	echo "Expected one of: standard, template"
+	exit 1
+fi
 
 
 case "$DATA" in
@@ -68,7 +80,7 @@ for MODEL in "${MODELS[@]}"; do
 		echo ""
 		echo "=== Running model: $MODEL ==="
 		echo "Data: $DATA_ITEM, Task: $TASK"
-		"$PYTHON_BIN" get_probs.py --data "$DATA_ITEM" --task "$TASK" --model "$MODEL"
+		"$PYTHON_BIN" "$python_script" --data "$DATA_ITEM" --task "$TASK" --model "$MODEL"
 	done
 done
 
