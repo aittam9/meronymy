@@ -17,7 +17,7 @@ data_map = {'mcrae_lemma_questions_results': 'McRae-lemma', 'mcrae_questions_res
 
 
 
-def load_results(path, experiment = ["probabilities", "probabilities_templates", "prompting"]):
+def load_results(path:str, experiment: Literal["probabilities", "probabilities_templates", "prompting"] = None) -> Tuple[pd.DataFrame, pd.dataframe]:
     all_results_questions = []
     all_results_statements = []
     if experiment in ["probabilities", "probabilities_templates"]:
@@ -53,7 +53,7 @@ def load_results(path, experiment = ["probabilities", "probabilities_templates",
 
 
 
-def plot_prob_experiment(all_results_q_prob, all_results_s_prob, template = False):
+def plot_prob_experiment(all_results_q_prob: pd.DataFrame, all_results_s_prob: pd.DataFrame, template: bool = False) -> None:
     
     fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
 
@@ -93,7 +93,7 @@ def plot_prob_experiment(all_results_q_prob, all_results_s_prob, template = Fals
 
 
 
-def plot_model_prob_diff(df, model, data, ax=None):
+def plot_model_prob_diff(df: pd.DataFrame, model: str, data: str, ax=None) -> None:
     prob1 = df[(df["model"] == model) & (df["data"] == data)]["sents_logprob"]
     prob2 = df[(df["model"] == model) & (df["data"] == data)]["swapped_logprob"]
     differences_distribution = prob1 - prob2
@@ -111,7 +111,7 @@ def plot_model_prob_diff(df, model, data, ax=None):
 
 
 
-def plot_distribution_differences(df, data):
+def plot_distribution_differences(df: pd.DataFrame, data: str) -> None:
     fig, axes = plt.subplots(2, 3, figsize=(20, 6), sharey=True)
     axes_flat = axes.flatten()
     
