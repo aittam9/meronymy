@@ -57,13 +57,14 @@ def plot_prob_experiment(all_results_q_prob: pd.DataFrame, all_results_s_prob: p
     
     fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
 
-    sns.barplot(x="model", y="sents_logprob_greater", hue="data", data=all_results_q_prob, ax=axes[0], legend=False).set(ylabel = "Probability Accuracy")
+    sns.barplot(x="model", y="sents_logprob_greater", hue="data", data=all_results_q_prob, ax=axes[0],
+                errorbar=('ci', False), palette = sns.color_palette("muted"),  legend = False).set(ylabel = "Probability Accuracy")
     axes[0].set_title("Questions")
     axes[0].tick_params(axis="x", rotation=30)
     axes[0].set_ylim(0, 1)
     axes[0].axhline(y=0.5, color="r", linestyle="--")
 
-    sns.barplot(x="model", y="sents_logprob_greater", hue="data", data=all_results_s_prob, ax=axes[1])
+    sns.barplot(x="model", y="sents_logprob_greater", hue="data", data=all_results_s_prob, ax=axes[1], errorbar=('ci', False), palette = sns.color_palette("muted"))
     axes[1].set_title("Statements")
     axes[1].tick_params(axis="x", rotation=30)
     axes[1].set_ylim(0, 1)
@@ -121,3 +122,5 @@ def plot_distribution_differences(df: pd.DataFrame, data: str) -> None:
     
     plt.suptitle(f"Distribution of probability differences for {data}")
     plt.tight_layout()
+
+

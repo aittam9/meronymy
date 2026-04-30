@@ -65,6 +65,6 @@ python get_probs.py --data conceptnet --model gemma-7b-it --task statements --te
 
 
 
-
+**Note** Part of the code has been written with the aid of artificial intelligence. In particular, AI has been employed in boilerplate code, bash scripting and regression analysis.
 
 
